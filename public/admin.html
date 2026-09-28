@@ -158,6 +158,12 @@
           <div class="actions" style="justify-content: flex-start; margin-top: 12px;"><button type="button" class="btn secondary" id="addExperienceBtn">+ Add Experience</button></div>
         </section>
 
+        <section>
+          <h2>Featured work</h2>
+          <div id="featuredWorkList"></div>
+          <div class="actions" style="justify-content: flex-start; margin-top: 12px;"><button type="button" class="btn secondary" id="addFeaturedWorkBtn">+ Add project</button></div>
+        </section>
+
         <div class="actions">
           <button type="button" class="btn secondary" onclick="window.location.href = getPublicPortfolioUrl()">Back to site</button>
           <button type="submit" class="btn primary">Save and update</button>
@@ -184,6 +190,10 @@
       { label: 'Tableau', value: 84 },
       { label: 'Excel', value: 86 },
       { label: 'Forecasting', value: 80 }
+    ];
+    const defaultFeaturedWork = [
+      { category: 'Growth', highlight: '+24%', title: 'Revenue Intelligence Dashboard', description: 'Designed a multi-channel performance model that unified product and marketing analytics for executive monitoring.', metricLabel: 'ROI uplift', metricValue: '24%' },
+      { category: 'Automation', highlight: '6 hrs', title: 'Automated KPI Reporting', description: 'Built a unified weekly reporting pipeline reducing manual reporting time and improving business responsiveness.', metricLabel: 'Saved per week', metricValue: '6 hrs' }
     ];
 
     function getPublicPortfolioUrl() {
@@ -291,6 +301,41 @@
       items.forEach(item => list.appendChild(createExperienceBlock(item)));
     }
 
+    function escapeMarkup(value) {
+      return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[character]);
+    }
+
+    function createFeaturedWorkBlock(item = {}) {
+      const block = document.createElement('div');
+      block.className = 'experience-block';
+      block.innerHTML = `
+        <button type="button" class="remove-btn">Remove</button>
+        <div class="section-grid">
+          <div class="field"><label>Category</label><input type="text" data-field="category" value="${escapeMarkup(item.category)}" /></div>
+          <div class="field"><label>Top highlight</label><input type="text" data-field="highlight" value="${escapeMarkup(item.highlight)}" /></div>
+          <div class="field"><label>Project title</label><input type="text" data-field="title" value="${escapeMarkup(item.title)}" /></div>
+          <div class="field"><label>Metric label</label><input type="text" data-field="metricLabel" value="${escapeMarkup(item.metricLabel)}" /></div>
+          <div class="field"><label>Metric value</label><input type="text" data-field="metricValue" value="${escapeMarkup(item.metricValue)}" /></div>
+          <div class="field" style="grid-column: 1 / -1;"><label>Description</label><textarea data-field="description">${escapeMarkup(item.description)}</textarea></div>
+        </div>
+      `;
+      block.querySelector('.remove-btn').addEventListener('click', () => block.remove());
+      return block;
+    }
+
+    function renderFeaturedWork(entries) {
+      const list = document.getElementById('featuredWorkList');
+      list.replaceChildren();
+      const items = Array.isArray(entries) ? entries : defaultFeaturedWork;
+      items.forEach(item => list.appendChild(createFeaturedWorkBlock(item)));
+    }
+
     function setValue(id, value) {
       const input = document.getElementById(id);
       if (input) input.value = value ?? '';
@@ -306,6 +351,7 @@
         const data = await response.json();
         const keyMetrics = Array.isArray(data.keyMetrics) ? data.keyMetrics : defaultKeyMetrics;
         const coreSkills = Array.isArray(data.coreSkills) ? data.coreSkills : defaultCoreSkills;
+        const featuredWork = Array.isArray(data.featuredWork) ? data.featuredWork : defaultFeaturedWork;
 
         setValue('brand', data.site?.brand || 'Alex Morgan');
         setValue('github', data.site?.github || 'github.com/alexmorgan');
@@ -349,6 +395,7 @@
           setValue(`coreSkill${itemNumber}Label`, skill.label);
           setValue(`coreSkill${itemNumber}Value`, skill.value);
         });
+        renderFeaturedWork(featuredWork);
         renderExperience(Array.isArray(data.experience) ? data.experience : []);
       } catch (error) {
         console.error('Failed to load portfolio data:', error);
@@ -414,6 +461,7 @@
           setValue(`coreSkill${itemNumber}Label`, skill.label);
           setValue(`coreSkill${itemNumber}Value`, skill.value);
         });
+        renderFeaturedWork(defaultFeaturedWork);
         renderExperience(fallback.experience);
       }
     }
@@ -422,12 +470,27 @@
       document.getElementById('experienceList').appendChild(createExperienceBlock());
     });
 
+    document.getElementById('addFeaturedWorkBtn').addEventListener('click', () => {
+      document.getElementById('featuredWorkList').appendChild(createFeaturedWorkBlock());
+    });
+
     function collectExperience() {
       return [...document.querySelectorAll('.experience-block')].map((block) => ({
         period: block.querySelector('[data-field="period"]').value.trim(),
         title: block.querySelector('[data-field="title"]').value.trim(),
         text: block.querySelector('[data-field="text"]').value.trim()
       })).filter((item) => item.period || item.title || item.text);
+    }
+
+    function collectFeaturedWork() {
+      return [...document.querySelectorAll('#featuredWorkList .experience-block')].map(block => ({
+        category: block.querySelector('[data-field="category"]').value.trim(),
+        highlight: block.querySelector('[data-field="highlight"]').value.trim(),
+        title: block.querySelector('[data-field="title"]').value.trim(),
+        description: block.querySelector('[data-field="description"]').value.trim(),
+        metricLabel: block.querySelector('[data-field="metricLabel"]').value.trim(),
+        metricValue: block.querySelector('[data-field="metricValue"]').value.trim()
+      })).filter(item => Object.values(item).some(Boolean));
     }
 
     function collectStats() {
@@ -476,6 +539,7 @@
         stats: collectStats(),
         keyMetrics: collectKeyMetrics(),
         coreSkills: collectCoreSkills(),
+        featuredWork: collectFeaturedWork(),
         summary: { title: document.getElementById('summaryTitle').value, text: document.getElementById('summaryText').value },
         skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(Boolean),
         contact: { email: document.getElementById('contactEmail').value, location: document.getElementById('contactLocation').value, linkedin: document.getElementById('contactLinkedin').value, phone: document.getElementById('contactPhone').value },

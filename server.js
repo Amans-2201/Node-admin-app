@@ -65,6 +65,24 @@ function defaultData() {
       { label: 'Excel', value: 86 },
       { label: 'Forecasting', value: 80 }
     ],
+    featuredWork: [
+      {
+        category: 'Growth',
+        highlight: '+24%',
+        title: 'Revenue Intelligence Dashboard',
+        description: 'Designed a multi-channel performance model that unified product and marketing analytics for executive monitoring.',
+        metricLabel: 'ROI uplift',
+        metricValue: '24%'
+      },
+      {
+        category: 'Automation',
+        highlight: '6 hrs',
+        title: 'Automated KPI Reporting',
+        description: 'Built a unified weekly reporting pipeline reducing manual reporting time and improving business responsiveness.',
+        metricLabel: 'Saved per week',
+        metricValue: '6 hrs'
+      }
+    ],
     summary: {
       title: 'Professional Summary',
       text: 'I design meaningful analytics systems that help teams see trends, act on opportunities, and build confidence in decision-making. My expertise sits at the intersection of SQL, business intelligence, marketing analytics, and experimentation.'

@@ -14,6 +14,7 @@ The app lets you manage the public portfolio content from a secure private dashb
 - skills list
 - Core Skills proficiency chart values
 - Focus Areas chart values
+- Featured Work cards, with add/remove support
 - experience timeline
 - save/update workflow for the public site
 
@@ -112,6 +113,7 @@ Request body:
     "stats": [],
     "keyMetrics": [],
     "coreSkills": [],
+    "featuredWork": [],
     "summary": {},
     "skills": [],
     "contact": {},
