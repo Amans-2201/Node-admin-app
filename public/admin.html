@@ -32,7 +32,7 @@
     label { font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
     input, textarea { width: 100%; border: 1px solid rgba(148, 163, 184, 0.5); border-radius: 12px; padding: 0.9rem 1rem; font: inherit; color: var(--text); background: white; }
     textarea { min-height: 110px; resize: vertical; }
-    .experience-block { border: 1px solid var(--border); background: rgba(238,242,255,0.7); border-radius: 18px; padding: 16px; display: grid; gap: 12px; }
+    .experience-block, .featured-work-block { border: 1px solid var(--border); background: rgba(238,242,255,0.7); border-radius: 18px; padding: 16px; display: grid; gap: 12px; }
     .remove-btn { justify-self: end; background: rgba(239,68,68,0.1); color: #b91c1c; border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 0.5rem 0.75rem; font-weight: 700; cursor: pointer; }
     .actions { display: flex; justify-content: flex-end; gap: 12px; }
     .status { min-height: 24px; font-weight: 700; color: var(--success); }
@@ -313,7 +313,7 @@
 
     function createFeaturedWorkBlock(item = {}) {
       const block = document.createElement('div');
-      block.className = 'experience-block';
+      block.className = 'featured-work-block';
       block.innerHTML = `
         <button type="button" class="remove-btn">Remove</button>
         <div class="section-grid">
@@ -475,7 +475,7 @@
     });
 
     function collectExperience() {
-      return [...document.querySelectorAll('.experience-block')].map((block) => ({
+      return [...document.querySelectorAll('#experienceList .experience-block')].map((block) => ({
         period: block.querySelector('[data-field="period"]').value.trim(),
         title: block.querySelector('[data-field="title"]').value.trim(),
         text: block.querySelector('[data-field="text"]').value.trim()
@@ -483,7 +483,7 @@
     }
 
     function collectFeaturedWork() {
-      return [...document.querySelectorAll('#featuredWorkList .experience-block')].map(block => ({
+      return [...document.querySelectorAll('#featuredWorkList .featured-work-block')].map(block => ({
         category: block.querySelector('[data-field="category"]').value.trim(),
         highlight: block.querySelector('[data-field="highlight"]').value.trim(),
         title: block.querySelector('[data-field="title"]').value.trim(),
