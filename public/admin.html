@@ -120,8 +120,86 @@
   </div>
 
   <script>
-    const ADMIN_PASSWORD = 'Jimmy123';
+    const ADMIN_PASSWORD = window.ADMIN_PASSWORD || '';
     const apiUrl = '/api/portfolio';
+    const authKey = 'portfolio-admin-authorized';
+
+    function getAuthOverlay() {
+      const existing = document.getElementById('adminAuthOverlay');
+      if (existing) return existing;
+
+      const overlay = document.createElement('div');
+      overlay.id = 'adminAuthOverlay';
+      overlay.style.position = 'fixed';
+      overlay.style.inset = '0';
+      overlay.style.background = 'rgba(15, 23, 42, 0.72)';
+      overlay.style.display = 'flex';
+      overlay.style.alignItems = 'center';
+      overlay.style.justifyContent = 'center';
+      overlay.style.zIndex = '9999';
+
+      const box = document.createElement('div');
+      box.style.width = 'min(420px, calc(100% - 28px))';
+      box.style.background = '#fff';
+      box.style.borderRadius = '20px';
+      box.style.padding = '24px';
+      box.style.boxShadow = '0 20px 45px rgba(15, 23, 42, 0.22)';
+      box.innerHTML = `
+        <h2 style="margin:0 0 8px;font-size:1.7rem;">Admin access</h2>
+        <p style="margin:0 0 18px;color:#475569;">Enter the password to continue.</p>
+        <input id="adminAuthInput" type="password" placeholder="Password" style="width:100%;border:1px solid rgba(148,163,184,0.6);border-radius:12px;padding:0.9rem 1rem;font:inherit;margin-bottom:14px;" />
+        <div style="display:flex;justify-content:flex-end;gap:10px;">
+          <button type="button" id="adminAuthCancel" style="border:none;border-radius:12px;padding:0.75rem 1rem;background:#eef2ff;color:#1f2937;font-weight:700;cursor:pointer;">Cancel</button>
+          <button type="button" id="adminAuthSubmit" style="border:none;border-radius:12px;padding:0.75rem 1rem;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;font-weight:700;cursor:pointer;">Open</button>
+        </div>
+      `;
+
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+      return overlay;
+    }
+
+    function authorizeAdmin() {
+      if (!ADMIN_PASSWORD) {
+        alert('Admin password is not configured.');
+        window.location.href = '/';
+        return false;
+      }
+
+      const stored = sessionStorage.getItem(authKey) === 'true';
+      if (stored) return true;
+
+      const overlay = getAuthOverlay();
+      const input = document.getElementById('adminAuthInput');
+      const submit = document.getElementById('adminAuthSubmit');
+      const cancel = document.getElementById('adminAuthCancel');
+
+      const unlock = () => {
+        const password = input.value.trim();
+        if (password === ADMIN_PASSWORD) {
+          sessionStorage.setItem(authKey, 'true');
+          overlay.remove();
+          loadData();
+          return;
+        }
+
+        input.value = '';
+        input.focus();
+        alert('Incorrect password.');
+      };
+
+      submit.addEventListener('click', unlock);
+      cancel.addEventListener('click', () => {
+        sessionStorage.removeItem(authKey);
+        window.location.href = '/';
+      });
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') unlock();
+      });
+
+      input.focus();
+      return false;
+    }
 
     function createExperienceBlock(entry = {}) {
       const block = document.createElement('div');
@@ -228,10 +306,14 @@
     });
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem(authKey);
       window.location.href = '/';
     });
 
-    loadData();
+    if (!authorizeAdmin()) {
+      document.querySelector('.shell').style.filter = 'blur(2px)';
+      document.querySelector('.shell').style.pointerEvents = 'none';
+    }
   </script>
 </body>
 </html>

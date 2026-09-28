@@ -101,7 +101,13 @@ app.post('/api/portfolio', (req, res) => {
 });
 
 app.get('/admin', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+  const adminHtmlPath = path.join(__dirname, 'public', 'admin.html');
+  const adminHtml = fs.readFileSync(adminHtmlPath, 'utf8');
+  const injectedHtml = adminHtml.replace(
+    '</head>',
+    `  <script>window.ADMIN_PASSWORD = ${JSON.stringify(adminPassword)};</script>\n</head>`
+  );
+  res.send(injectedHtml);
 });
 
 app.use('/admin', express.static(path.join(__dirname, 'public')));
