@@ -4,8 +4,27 @@ const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
-const adminPassword = process.env.ADMIN_PASSWORD || 'Jimmy123';
+const adminPassword = process.env.ADMIN_PASSWORD || '';
 const dataFile = path.join(__dirname, 'data', 'portfolio.json');
+const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://amans-2201.github.io';
+
+app.use((req, res, next) => {
+  const requestOrigin = req.headers.origin;
+  const originToAllow = requestOrigin && requestOrigin.startsWith('https://amans-2201.github.io')
+    ? requestOrigin
+    : allowedOrigin;
+
+  res.header('Access-Control-Allow-Origin', originToAllow);
+  res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 
 app.use(express.json({ limit: '1mb' }));
 
