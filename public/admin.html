@@ -323,9 +323,10 @@
 
       const result = await response.json();
       const status = document.getElementById('status');
+      const publicPortfolioUrl = 'https://amans-2201.github.io/Static-Portfolio/';
       if (response.ok) {
         status.textContent = 'Saved successfully.';
-        setTimeout(() => window.location.href = '/', 700);
+        setTimeout(() => window.location.href = publicPortfolioUrl, 700);
       } else {
         status.textContent = result.message || 'Save failed.';
       }
@@ -333,7 +334,7 @@
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
       sessionStorage.removeItem(authKey);
-      window.location.href = '/';
+      window.location.href = 'https://amans-2201.github.io/Static-Portfolio/';
     });
 
     const shell = document.querySelector('.shell');
