@@ -62,6 +62,11 @@ function defaultData() {
       linkedin: 'linkedin.com/in/alexmorgan',
       phone: '+1 (415) 224-9901'
     },
+    focusAreas: [
+      { label: 'Analytics', value: 45 },
+      { label: 'Product', value: 35 },
+      { label: 'Insights', value: 20 }
+    ],
     experience: [
       {
         period: '2024 — Present',

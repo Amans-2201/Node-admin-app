@@ -100,6 +100,18 @@
         </section>
 
         <section>
+          <h2>Focus areas</h2>
+          <div class="section-grid">
+            <div class="field"><label for="focusArea1Label">Focus 1 label</label><input id="focusArea1Label" type="text" /></div>
+            <div class="field"><label for="focusArea1Value">Focus 1 value</label><input id="focusArea1Value" type="number" min="0" max="100" /></div>
+            <div class="field"><label for="focusArea2Label">Focus 2 label</label><input id="focusArea2Label" type="text" /></div>
+            <div class="field"><label for="focusArea2Value">Focus 2 value</label><input id="focusArea2Value" type="number" min="0" max="100" /></div>
+            <div class="field"><label for="focusArea3Label">Focus 3 label</label><input id="focusArea3Label" type="text" /></div>
+            <div class="field"><label for="focusArea3Value">Focus 3 value</label><input id="focusArea3Value" type="number" min="0" max="100" /></div>
+          </div>
+        </section>
+
+        <section>
           <h2>Skills</h2>
           <div class="field"><label for="skills">Skills (comma separated)</label><textarea id="skills"></textarea></div>
         </section>
@@ -257,6 +269,12 @@
         setValue('stat2Label', data.stats?.[1]?.label || 'Dashboards shipped');
         setValue('stat3Value', data.stats?.[2]?.value || '$2.4M');
         setValue('stat3Label', data.stats?.[2]?.label || 'Revenue impact');
+        setValue('focusArea1Label', data.focusAreas?.[0]?.label || 'Analytics');
+        setValue('focusArea1Value', data.focusAreas?.[0]?.value ?? 45);
+        setValue('focusArea2Label', data.focusAreas?.[1]?.label || 'Product');
+        setValue('focusArea2Value', data.focusAreas?.[1]?.value ?? 35);
+        setValue('focusArea3Label', data.focusAreas?.[2]?.label || 'Insights');
+        setValue('focusArea3Value', data.focusAreas?.[2]?.value ?? 20);
         setValue('skills', (data.skills || []).join(', '));
         renderExperience(Array.isArray(data.experience) ? data.experience : []);
       } catch (error) {
@@ -273,6 +291,11 @@
           summary: { title: 'Professional Summary', text: '' },
           skills: ['Python', 'SQL', 'Power BI', 'Tableau', 'A/B Testing', 'Forecasting'],
           contact: { email: 'alex.morgan@email.com', location: 'New York, NY', linkedin: 'linkedin.com/in/alexmorgan', phone: '+1 (415) 224-9901' },
+          focusAreas: [
+            { label: 'Analytics', value: 45 },
+            { label: 'Product', value: 35 },
+            { label: 'Insights', value: 20 }
+          ],
           experience: [
             { period: '2024 — Present', title: 'Lead Analytics Architect — FinTech Corp', text: 'Leading the design of cloud-based forecasting, self-serve dashboards, and executive insight systems across the organization.' }
           ]
@@ -300,6 +323,12 @@
         setValue('stat2Label', fallback.stats[1].label);
         setValue('stat3Value', fallback.stats[2].value);
         setValue('stat3Label', fallback.stats[2].label);
+        setValue('focusArea1Label', fallback.focusAreas[0].label);
+        setValue('focusArea1Value', fallback.focusAreas[0].value);
+        setValue('focusArea2Label', fallback.focusAreas[1].label);
+        setValue('focusArea2Value', fallback.focusAreas[1].value);
+        setValue('focusArea3Label', fallback.focusAreas[2].label);
+        setValue('focusArea3Value', fallback.focusAreas[2].value);
         setValue('skills', fallback.skills.join(', '));
         renderExperience(fallback.experience);
       }
@@ -325,6 +354,14 @@
       ].filter(item => item.value || item.label);
     }
 
+    function collectFocusAreas() {
+      return [
+        { label: document.getElementById('focusArea1Label').value, value: Number(document.getElementById('focusArea1Value').value || 0) },
+        { label: document.getElementById('focusArea2Label').value, value: Number(document.getElementById('focusArea2Value').value || 0) },
+        { label: document.getElementById('focusArea3Label').value, value: Number(document.getElementById('focusArea3Value').value || 0) }
+      ].filter(item => item.label || item.value || item.value === 0);
+    }
+
     document.getElementById('adminForm').addEventListener('submit', async function (event) {
       event.preventDefault();
       const updated = {
@@ -335,6 +372,7 @@
         summary: { title: document.getElementById('summaryTitle').value, text: document.getElementById('summaryText').value },
         skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(Boolean),
         contact: { email: document.getElementById('contactEmail').value, location: document.getElementById('contactLocation').value, linkedin: document.getElementById('contactLinkedin').value, phone: document.getElementById('contactPhone').value },
+        focusAreas: collectFocusAreas(),
         experience: collectExperience()
       };
 
