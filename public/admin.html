@@ -100,6 +100,24 @@
         </section>
 
         <section>
+          <h2>Key statistics cards</h2>
+          <div class="section-grid">
+            <div class="field"><label for="keyMetric1Label">Card 1 heading</label><input id="keyMetric1Label" type="text" /></div>
+            <div class="field"><label for="keyMetric1Value">Card 1 value</label><input id="keyMetric1Value" type="text" /></div>
+            <div class="field" style="grid-column: 1 / -1;"><label for="keyMetric1Detail">Card 1 description</label><input id="keyMetric1Detail" type="text" /></div>
+            <div class="field"><label for="keyMetric2Label">Card 2 heading</label><input id="keyMetric2Label" type="text" /></div>
+            <div class="field"><label for="keyMetric2Value">Card 2 value</label><input id="keyMetric2Value" type="text" /></div>
+            <div class="field" style="grid-column: 1 / -1;"><label for="keyMetric2Detail">Card 2 description</label><input id="keyMetric2Detail" type="text" /></div>
+            <div class="field"><label for="keyMetric3Label">Card 3 heading</label><input id="keyMetric3Label" type="text" /></div>
+            <div class="field"><label for="keyMetric3Value">Card 3 value</label><input id="keyMetric3Value" type="text" /></div>
+            <div class="field" style="grid-column: 1 / -1;"><label for="keyMetric3Detail">Card 3 description</label><input id="keyMetric3Detail" type="text" /></div>
+            <div class="field"><label for="keyMetric4Label">Card 4 heading</label><input id="keyMetric4Label" type="text" /></div>
+            <div class="field"><label for="keyMetric4Value">Card 4 value</label><input id="keyMetric4Value" type="text" /></div>
+            <div class="field" style="grid-column: 1 / -1;"><label for="keyMetric4Detail">Card 4 description</label><input id="keyMetric4Detail" type="text" /></div>
+          </div>
+        </section>
+
+        <section>
           <h2>Focus areas</h2>
           <div class="section-grid">
             <div class="field"><label for="focusArea1Label">Focus 1 label</label><input id="focusArea1Label" type="text" /></div>
@@ -114,6 +132,24 @@
         <section>
           <h2>Skills</h2>
           <div class="field"><label for="skills">Skills (comma separated)</label><textarea id="skills"></textarea></div>
+        </section>
+
+        <section>
+          <h2>Core skills proficiency</h2>
+          <div class="section-grid">
+            <div class="field"><label for="coreSkill1Label">Skill 1 name</label><input id="coreSkill1Label" type="text" /></div>
+            <div class="field"><label for="coreSkill1Value">Skill 1 proficiency (0-100)</label><input id="coreSkill1Value" type="number" min="0" max="100" /></div>
+            <div class="field"><label for="coreSkill2Label">Skill 2 name</label><input id="coreSkill2Label" type="text" /></div>
+            <div class="field"><label for="coreSkill2Value">Skill 2 proficiency (0-100)</label><input id="coreSkill2Value" type="number" min="0" max="100" /></div>
+            <div class="field"><label for="coreSkill3Label">Skill 3 name</label><input id="coreSkill3Label" type="text" /></div>
+            <div class="field"><label for="coreSkill3Value">Skill 3 proficiency (0-100)</label><input id="coreSkill3Value" type="number" min="0" max="100" /></div>
+            <div class="field"><label for="coreSkill4Label">Skill 4 name</label><input id="coreSkill4Label" type="text" /></div>
+            <div class="field"><label for="coreSkill4Value">Skill 4 proficiency (0-100)</label><input id="coreSkill4Value" type="number" min="0" max="100" /></div>
+            <div class="field"><label for="coreSkill5Label">Skill 5 name</label><input id="coreSkill5Label" type="text" /></div>
+            <div class="field"><label for="coreSkill5Value">Skill 5 proficiency (0-100)</label><input id="coreSkill5Value" type="number" min="0" max="100" /></div>
+            <div class="field"><label for="coreSkill6Label">Skill 6 name</label><input id="coreSkill6Label" type="text" /></div>
+            <div class="field"><label for="coreSkill6Value">Skill 6 proficiency (0-100)</label><input id="coreSkill6Value" type="number" min="0" max="100" /></div>
+          </div>
         </section>
 
         <section>
@@ -135,6 +171,20 @@
     const ADMIN_PASSWORD = window.ADMIN_PASSWORD || '';
     const apiUrl = '/api/portfolio';
     const authKey = 'portfolio-admin-authorized';
+    const defaultKeyMetrics = [
+      { label: 'Experience', value: '5+ yrs', detail: 'Across SaaS, fintech, and commerce' },
+      { label: 'Automation', value: '85%', detail: 'Reporting workflows automated' },
+      { label: 'Efficiency', value: '35%', detail: 'Faster decision cycles' },
+      { label: 'Impact', value: '14%', detail: 'Conversion wins through insights' }
+    ];
+    const defaultCoreSkills = [
+      { label: 'SQL', value: 92 },
+      { label: 'Python', value: 88 },
+      { label: 'Power BI', value: 90 },
+      { label: 'Tableau', value: 84 },
+      { label: 'Excel', value: 86 },
+      { label: 'Forecasting', value: 80 }
+    ];
 
     function getPublicPortfolioUrl() {
       const timestamp = Date.now();
@@ -254,6 +304,8 @@
         }
 
         const data = await response.json();
+        const keyMetrics = Array.isArray(data.keyMetrics) ? data.keyMetrics : defaultKeyMetrics;
+        const coreSkills = Array.isArray(data.coreSkills) ? data.coreSkills : defaultCoreSkills;
 
         setValue('brand', data.site?.brand || 'Alex Morgan');
         setValue('github', data.site?.github || 'github.com/alexmorgan');
@@ -277,6 +329,13 @@
         setValue('stat2Label', data.stats?.[1]?.label || 'Dashboards shipped');
         setValue('stat3Value', data.stats?.[2]?.value || '$2.4M');
         setValue('stat3Label', data.stats?.[2]?.label || 'Revenue impact');
+        defaultKeyMetrics.forEach((_, index) => {
+          const metric = keyMetrics[index] || {};
+          const itemNumber = index + 1;
+          setValue(`keyMetric${itemNumber}Label`, metric.label);
+          setValue(`keyMetric${itemNumber}Value`, metric.value);
+          setValue(`keyMetric${itemNumber}Detail`, metric.detail);
+        });
         setValue('focusArea1Label', data.focusAreas?.[0]?.label || 'Analytics');
         setValue('focusArea1Value', data.focusAreas?.[0]?.value ?? 45);
         setValue('focusArea2Label', data.focusAreas?.[1]?.label || 'Product');
@@ -284,6 +343,12 @@
         setValue('focusArea3Label', data.focusAreas?.[2]?.label || 'Insights');
         setValue('focusArea3Value', data.focusAreas?.[2]?.value ?? 20);
         setValue('skills', (data.skills || []).join(', '));
+        defaultCoreSkills.forEach((_, index) => {
+          const skill = coreSkills[index] || {};
+          const itemNumber = index + 1;
+          setValue(`coreSkill${itemNumber}Label`, skill.label);
+          setValue(`coreSkill${itemNumber}Value`, skill.value);
+        });
         renderExperience(Array.isArray(data.experience) ? data.experience : []);
       } catch (error) {
         console.error('Failed to load portfolio data:', error);
@@ -331,6 +396,12 @@
         setValue('stat2Label', fallback.stats[1].label);
         setValue('stat3Value', fallback.stats[2].value);
         setValue('stat3Label', fallback.stats[2].label);
+        defaultKeyMetrics.forEach((metric, index) => {
+          const itemNumber = index + 1;
+          setValue(`keyMetric${itemNumber}Label`, metric.label);
+          setValue(`keyMetric${itemNumber}Value`, metric.value);
+          setValue(`keyMetric${itemNumber}Detail`, metric.detail);
+        });
         setValue('focusArea1Label', fallback.focusAreas[0].label);
         setValue('focusArea1Value', fallback.focusAreas[0].value);
         setValue('focusArea2Label', fallback.focusAreas[1].label);
@@ -338,6 +409,11 @@
         setValue('focusArea3Label', fallback.focusAreas[2].label);
         setValue('focusArea3Value', fallback.focusAreas[2].value);
         setValue('skills', fallback.skills.join(', '));
+        defaultCoreSkills.forEach((skill, index) => {
+          const itemNumber = index + 1;
+          setValue(`coreSkill${itemNumber}Label`, skill.label);
+          setValue(`coreSkill${itemNumber}Value`, skill.value);
+        });
         renderExperience(fallback.experience);
       }
     }
@@ -362,6 +438,27 @@
       ].filter(item => item.value || item.label);
     }
 
+    function collectKeyMetrics() {
+      return defaultKeyMetrics.map((_, index) => {
+        const itemNumber = index + 1;
+        return {
+          label: document.getElementById(`keyMetric${itemNumber}Label`).value.trim(),
+          value: document.getElementById(`keyMetric${itemNumber}Value`).value.trim(),
+          detail: document.getElementById(`keyMetric${itemNumber}Detail`).value.trim()
+        };
+      });
+    }
+
+    function collectCoreSkills() {
+      return defaultCoreSkills.map((_, index) => {
+        const itemNumber = index + 1;
+        return {
+          label: document.getElementById(`coreSkill${itemNumber}Label`).value.trim(),
+          value: Number(document.getElementById(`coreSkill${itemNumber}Value`).value || 0)
+        };
+      }).filter(skill => skill.label);
+    }
+
     function collectFocusAreas() {
       return [
         { label: document.getElementById('focusArea1Label').value, value: Number(document.getElementById('focusArea1Value').value || 0) },
@@ -377,6 +474,8 @@
         hero: { eyebrow: document.getElementById('heroEyebrow').value, title: document.getElementById('heroTitle').value, description: document.getElementById('heroDescription').value },
         profile: { name: document.getElementById('profileName').value, image: document.getElementById('profileImage').value, githubText: document.getElementById('profileGithubText').value, githubUrl: document.getElementById('profileGithubUrl').value },
         stats: collectStats(),
+        keyMetrics: collectKeyMetrics(),
+        coreSkills: collectCoreSkills(),
         summary: { title: document.getElementById('summaryTitle').value, text: document.getElementById('summaryText').value },
         skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(Boolean),
         contact: { email: document.getElementById('contactEmail').value, location: document.getElementById('contactLocation').value, linkedin: document.getElementById('contactLinkedin').value, phone: document.getElementById('contactPhone').value },

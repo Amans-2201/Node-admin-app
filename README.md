@@ -10,8 +10,10 @@ The app lets you manage the public portfolio content from a secure private dashb
 - hero section text
 - profile details and GitHub link
 - summary and contact info
-- stats cards
+- hero stats and key statistics cards
 - skills list
+- Core Skills proficiency chart values
+- Focus Areas chart values
 - experience timeline
 - save/update workflow for the public site
 
@@ -108,6 +110,8 @@ Request body:
     "hero": {},
     "profile": {},
     "stats": [],
+    "keyMetrics": [],
+    "coreSkills": [],
     "summary": {},
     "skills": [],
     "contact": {},

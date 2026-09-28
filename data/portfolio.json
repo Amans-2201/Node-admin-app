@@ -20,6 +20,20 @@
     { "value": "40+", "label": "Dashboards shipped" },
     { "value": "$2.4M", "label": "Revenue impact" }
   ],
+  "keyMetrics": [
+    { "label": "Experience", "value": "5+ yrs", "detail": "Across SaaS, fintech, and commerce" },
+    { "label": "Automation", "value": "85%", "detail": "Reporting workflows automated" },
+    { "label": "Efficiency", "value": "35%", "detail": "Faster decision cycles" },
+    { "label": "Impact", "value": "14%", "detail": "Conversion wins through insights" }
+  ],
+  "coreSkills": [
+    { "label": "SQL", "value": 92 },
+    { "label": "Python", "value": 88 },
+    { "label": "Power BI", "value": 90 },
+    { "label": "Tableau", "value": 84 },
+    { "label": "Excel", "value": 86 },
+    { "label": "Forecasting", "value": 80 }
+  ],
   "summary": {
     "title": "Professional Summary",
     "text": "I design meaningful analytics systems that help teams see trends, act on opportunities, and build confidence in decision-making. My expertise sits at the intersection of SQL, business intelligence, marketing analytics, and experimentation."
