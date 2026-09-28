@@ -123,7 +123,7 @@
         </section>
 
         <div class="actions">
-          <button type="button" class="btn secondary" onclick="window.location.href='/'">Back to site</button>
+          <button type="button" class="btn secondary" onclick="window.location.href = getPublicPortfolioUrl()">Back to site</button>
           <button type="submit" class="btn primary">Save and update</button>
         </div>
         <div id="status" class="status" aria-live="polite"></div>
@@ -135,6 +135,14 @@
     const ADMIN_PASSWORD = window.ADMIN_PASSWORD || '';
     const apiUrl = '/api/portfolio';
     const authKey = 'portfolio-admin-authorized';
+
+    function getPublicPortfolioUrl() {
+      const timestamp = Date.now();
+      if (window.location.hostname === 'localhost' || window.location.protocol === 'file:') {
+        return `../index.html?v=${timestamp}`;
+      }
+      return `https://amans-2201.github.io/Static-Portfolio/?v=${timestamp}`;
+    }
 
     function getAuthOverlay() {
       const existing = document.getElementById('adminAuthOverlay');
@@ -174,7 +182,7 @@
     function authorizeAdmin() {
       if (!ADMIN_PASSWORD) {
         alert('Admin password is not configured.');
-        window.location.href = '/';
+        window.location.href = getPublicPortfolioUrl();
         return false;
       }
 
@@ -203,7 +211,7 @@
       submit.addEventListener('click', unlock);
       cancel.addEventListener('click', () => {
         sessionStorage.removeItem(authKey);
-        window.location.href = '/';
+        window.location.href = getPublicPortfolioUrl();
       });
       input.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') unlock();
@@ -395,7 +403,7 @@
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
       sessionStorage.removeItem(authKey);
-      window.location.href = `https://amans-2201.github.io/Static-Portfolio/?v=${Date.now()}`;
+      window.location.href = getPublicPortfolioUrl();
     });
 
     const shell = document.querySelector('.shell');
