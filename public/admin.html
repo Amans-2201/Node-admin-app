@@ -227,8 +227,34 @@
     }
 
     async function loadData() {
-      const response = await fetch(apiUrl);
-      const data = await response.json();
+      const sources = [
+        'https://amans-2201.github.io/Static-Portfolio/portfolio-data.js',
+        apiUrl
+      ];
+
+      let data = {};
+
+      for (const url of sources) {
+        try {
+          const response = await fetch(url, { cache: 'no-store' });
+          if (!response.ok) continue;
+
+          const text = await response.text();
+
+          if (url.includes('portfolio-data.js')) {
+            const match = text.match(/window\.portfolioData\s*=\s*(\{[\s\S]*?\});\s*window\.portfolioStorageKey/);
+            if (match && match[1]) {
+              data = JSON.parse(match[1]);
+              break;
+            }
+          } else {
+            data = await response.json();
+            break;
+          }
+        } catch (error) {
+          console.warn('Portfolio source unavailable:', url, error);
+        }
+      }
 
       setValue('brand', data.site?.brand || 'Alex Morgan');
       setValue('github', data.site?.github || 'github.com/alexmorgan');
