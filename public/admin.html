@@ -310,9 +310,15 @@
       window.location.href = '/';
     });
 
+    const shell = document.querySelector('.shell');
     if (!authorizeAdmin()) {
-      document.querySelector('.shell').style.filter = 'blur(2px)';
-      document.querySelector('.shell').style.pointerEvents = 'none';
+      shell.style.filter = 'blur(2px)';
+      shell.style.pointerEvents = 'none';
+      shell.style.userSelect = 'none';
+    } else {
+      shell.style.filter = 'none';
+      shell.style.pointerEvents = 'auto';
+      shell.style.userSelect = 'auto';
     }
   </script>
 </body>
