@@ -1,36 +1,26 @@
 # Portfolio Admin App
 
-This is the private admin tool for managing the content shown on the static portfolio website.
+This is the private admin backend for the static GitHub Pages portfolio. It handles authentication, stores the portfolio JSON, and serves the admin editing form.
 
 ## Purpose
 
-The admin app lets you update:
-- brand and site text
-- hero section content
-- profile information
-- summary and contact details
-- skills
+The app lets you manage the public portfolio content from a secure private dashboard, including:
+
+- site identity and branding
+- hero section text
+- profile details and GitHub link
+- summary and contact info
+- stats cards
+- skills list
 - experience timeline
-- portfolio stats
+- save/update workflow for the public site
 
 ## Tech stack
 
 - Node.js
 - Express.js
 - JSON file storage
-
-## Quick start
-
-```bash
-npm install
-npm start
-```
-
-Then open:
-
-```text
-http://localhost:3000/admin
-```
+- Optional deployment on Render
 
 ## Project structure
 
@@ -43,40 +33,30 @@ node-admin-app/
 ├── server.js
 ├── package.json
 ├── .env.example
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    G[Admin User] --> A[Admin Page]
-    A --> B[Express API]
+    U[Admin User] --> A[Private Admin App on Render]
+    A --> B[Express API /api/portfolio]
     B --> C[portfolio.json]
-    B --> D[Public Site Data]
-    D --> E[GitHub Pages Portfolio]
+    A --> D[Admin Form UI]
+    E[Public GitHub Pages Portfolio] --> F[Fetches portfolio API]
+    F --> A
 ```
 
-## Installation
+The public portfolio site is static and hosted on GitHub Pages. It fetches the latest data from the private Render app instead of storing content locally.
+
+## Quick start
 
 From this folder:
 
 ```bash
 npm install
-```
-
-## Environment variables
-
-Create a `.env` file or set the variable in your hosting platform:
-
-```bash
-ADMIN_PASSWORD=Arnold@123
-PORT=3000
-```
-
-## Run locally
-
-```bash
 npm start
 ```
 
@@ -86,21 +66,39 @@ Then open:
 http://localhost:3000/admin
 ```
 
+## Environment variables
+
+Create a `.env` file or set the values in Render / your hosting provider:
+
+```bash
+ADMIN_PASSWORD=Arnold@123
+PORT=3000
+ALLOWED_ORIGIN=https://amans-2201.github.io
+```
+
+### Notes
+
+- `ADMIN_PASSWORD` is the password used by the admin login.
+- `ALLOWED_ORIGIN` allows the GitHub Pages site to fetch data from the Render API.
+- If `ALLOWED_ORIGIN` is omitted, the app falls back to the default GitHub Pages origin.
+
 ## API endpoints
 
-### Get portfolio data
+### GET portfolio data
 
 ```text
 GET /api/portfolio
 ```
 
-### Save portfolio data
+Returns the current portfolio JSON for the public site.
+
+### POST update portfolio data
 
 ```text
 POST /api/portfolio
 ```
 
-Body:
+Request body:
 
 ```json
 {
@@ -118,59 +116,99 @@ Body:
 }
 ```
 
-## Deployment
+The server validates the password before writing to `data/portfolio.json`.
 
-Deploy this app on Render or another private hosting service. Keep the admin URL private and do not expose the admin password in static public files.
+## Admin login behavior
 
-### Render deployment steps
+- The admin dashboard is served from the private app, not GitHub Pages.
+- The password is injected into the admin page from the server.
+- The page stores authentication in browser session storage.
+- The admin form loads existing data from `/api/portfolio`.
+- After a successful save, the admin page redirects back to the public portfolio URL.
 
-1. Sign in to Render.
-2. Click "New" and choose "Web Service".
-3. Connect the GitHub repository that contains this app.
-4. Select the repository and branch.
-5. Use the following build command:
+## Local development
 
-```bash
-npm install
-```
-
-6. Use the following start command:
+Run the app locally:
 
 ```bash
 npm start
 ```
 
-7. Add the environment variable:
+Then access:
+
+```text
+http://localhost:3000/admin
+```
+
+## Render deployment
+
+### Steps
+
+1. Push this folder to GitHub.
+2. Log in to Render.
+3. Create a new Web Service.
+4. Connect the repository.
+5. Set the build command:
+
+```bash
+npm install
+```
+
+6. Set the start command:
+
+```bash
+npm start
+```
+
+7. Add environment variables:
 
 ```bash
 ADMIN_PASSWORD=Arnold@123
 PORT=3000
+ALLOWED_ORIGIN=https://amans-2201.github.io
 ```
 
-8. Click Deploy.
-9. Copy the public Render URL and open `/admin` on that domain.
+8. Deploy the service.
+9. Open the Render URL + `/admin` to access the private admin portal.
+
+## CORS and public site sync
+
+The public static portfolio is hosted on GitHub Pages, but it fetches live content from the Render admin API. For this to work, the Render app must allow the GitHub Pages origin via CORS headers.
+
+This is why `ALLOWED_ORIGIN` is required in production.
 
 ## Troubleshooting
 
+### Public page still shows old content
+
+- Redeploy the Render app after editing server code or env vars.
+- Confirm the public site is fetching from the live Render URL.
+- Check browser console for CORS errors.
+- Confirm `ALLOWED_ORIGIN` matches the GitHub Pages URL exactly.
+
+### Admin page shows a password prompt repeatedly
+
+- Confirm `ADMIN_PASSWORD` is set correctly in Render.
+- Clear session storage in the browser and retry.
+- Restart the Render service after changing the environment variable.
+
+### Save request fails
+
+- Confirm the admin page is running from the private app URL.
+- Check the Render logs for errors.
+- Verify the JSON payload contains a valid `data` object.
+
 ### Render deploy fails
 
-- Check the build command: `npm install`
-- Check the start command: `npm start`
-- Look at Render logs for missing dependencies or runtime errors.
-- Confirm the app is connected to the correct repository.
-
-### Admin page loads without password
-
-- Verify the admin page is served by the private app and not as a local static file.
-- Confirm the password guard script is active in the admin page.
-- Clear browser cache if an old version is still being served.
-
-### Password not accepted
-
-- Confirm the environment variable is set exactly as `ADMIN_PASSWORD`.
-- Redeploy the service after changing the value.
-- Test the private admin URL directly and avoid the GitHub Pages site for admin access.
+- Check the build command is `npm install`.
+- Check the start command is `npm start`.
+- Verify dependencies are installed correctly.
+- Review Render logs for runtime errors.
 
 ## Security note
 
-The public portfolio is hosted on GitHub Pages, while this admin app should remain on a private server. The public site should not contain the admin password in client-side code.
+This app must stay on a private host. The public portfolio must never contain the admin password or sensitive admin logic. The static GitHub Pages site is only the consumer of the saved portfolio data.
+
+## Important deployment principle
+
+The source of truth for the portfolio content is the private JSON file on the admin app server. The GitHub Pages portfolio is a static frontend that reads from the live API and renders the latest data after save.

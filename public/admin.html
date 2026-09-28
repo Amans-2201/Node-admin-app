@@ -362,9 +362,9 @@
 
     const shell = document.querySelector('.shell');
     if (!authorizeAdmin()) {
-      shell.style.filter = 'blur(2px)';
-      shell.style.pointerEvents = 'none';
-      shell.style.userSelect = 'none';
+      shell.style.filter = 'none';
+      shell.style.pointerEvents = 'auto';
+      shell.style.userSelect = 'auto';
     } else {
       shell.style.filter = 'none';
       shell.style.pointerEvents = 'auto';
