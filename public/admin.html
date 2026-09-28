@@ -227,59 +227,82 @@
     }
 
     async function loadData() {
-      const sources = [
-        'https://amans-2201.github.io/Static-Portfolio/portfolio-data.js',
-        apiUrl
-      ];
-
-      let data = {};
-
-      for (const url of sources) {
-        try {
-          const response = await fetch(url, { cache: 'no-store' });
-          if (!response.ok) continue;
-
-          const text = await response.text();
-
-          if (url.includes('portfolio-data.js')) {
-            const match = text.match(/window\.portfolioData\s*=\s*(\{[\s\S]*?\});\s*window\.portfolioStorageKey/);
-            if (match && match[1]) {
-              data = JSON.parse(match[1]);
-              break;
-            }
-          } else {
-            data = await response.json();
-            break;
-          }
-        } catch (error) {
-          console.warn('Portfolio source unavailable:', url, error);
+      try {
+        const response = await fetch(apiUrl, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status}`);
         }
-      }
 
-      setValue('brand', data.site?.brand || 'Alex Morgan');
-      setValue('github', data.site?.github || 'github.com/alexmorgan');
-      setValue('githubUrl', data.site?.githubUrl || 'https://github.com/alexmorgan');
-      setValue('heroEyebrow', data.hero?.eyebrow || 'Data Analyst • Storyteller');
-      setValue('heroTitle', data.hero?.title || 'I turn raw data into business momentum.');
-      setValue('heroDescription', data.hero?.description || '');
-      setValue('profileName', data.profile?.name || 'Alex Morgan');
-      setValue('profileImage', data.profile?.image || './dummy-profile.jpg');
-      setValue('profileGithubText', data.profile?.githubText || 'github.com/alexmorgan');
-      setValue('profileGithubUrl', data.profile?.githubUrl || 'https://github.com/alexmorgan');
-      setValue('summaryTitle', data.summary?.title || 'Professional Summary');
-      setValue('summaryText', data.summary?.text || '');
-      setValue('contactEmail', data.contact?.email || 'alex.morgan@email.com');
-      setValue('contactLocation', data.contact?.location || 'New York, NY');
-      setValue('contactLinkedin', data.contact?.linkedin || 'linkedin.com/in/alexmorgan');
-      setValue('contactPhone', data.contact?.phone || '+1 (415) 224-9901');
-      setValue('stat1Value', data.stats?.[0]?.value || '5+');
-      setValue('stat1Label', data.stats?.[0]?.label || 'Years experience');
-      setValue('stat2Value', data.stats?.[1]?.value || '40+');
-      setValue('stat2Label', data.stats?.[1]?.label || 'Dashboards shipped');
-      setValue('stat3Value', data.stats?.[2]?.value || '$2.4M');
-      setValue('stat3Label', data.stats?.[2]?.label || 'Revenue impact');
-      setValue('skills', (data.skills || []).join(', '));
-      renderExperience(data.experience || []);
+        const data = await response.json();
+
+        setValue('brand', data.site?.brand || 'Alex Morgan');
+        setValue('github', data.site?.github || 'github.com/alexmorgan');
+        setValue('githubUrl', data.site?.githubUrl || 'https://github.com/alexmorgan');
+        setValue('heroEyebrow', data.hero?.eyebrow || 'Data Analyst • Storyteller');
+        setValue('heroTitle', data.hero?.title || 'I turn raw data into business momentum.');
+        setValue('heroDescription', data.hero?.description || '');
+        setValue('profileName', data.profile?.name || 'Alex Morgan');
+        setValue('profileImage', data.profile?.image || './dummy-profile.jpg');
+        setValue('profileGithubText', data.profile?.githubText || 'github.com/alexmorgan');
+        setValue('profileGithubUrl', data.profile?.githubUrl || 'https://github.com/alexmorgan');
+        setValue('summaryTitle', data.summary?.title || 'Professional Summary');
+        setValue('summaryText', data.summary?.text || '');
+        setValue('contactEmail', data.contact?.email || 'alex.morgan@email.com');
+        setValue('contactLocation', data.contact?.location || 'New York, NY');
+        setValue('contactLinkedin', data.contact?.linkedin || 'linkedin.com/in/alexmorgan');
+        setValue('contactPhone', data.contact?.phone || '+1 (415) 224-9901');
+        setValue('stat1Value', data.stats?.[0]?.value || '5+');
+        setValue('stat1Label', data.stats?.[0]?.label || 'Years experience');
+        setValue('stat2Value', data.stats?.[1]?.value || '40+');
+        setValue('stat2Label', data.stats?.[1]?.label || 'Dashboards shipped');
+        setValue('stat3Value', data.stats?.[2]?.value || '$2.4M');
+        setValue('stat3Label', data.stats?.[2]?.label || 'Revenue impact');
+        setValue('skills', (data.skills || []).join(', '));
+        renderExperience(Array.isArray(data.experience) ? data.experience : []);
+      } catch (error) {
+        console.error('Failed to load portfolio data:', error);
+        const fallback = {
+          site: { brand: 'Alex Morgan', github: 'github.com/alexmorgan', githubUrl: 'https://github.com/alexmorgan' },
+          hero: { eyebrow: 'Data Analyst • Storyteller', title: 'I turn raw data into business momentum.', description: '' },
+          profile: { name: 'Alex Morgan', image: './dummy-profile.jpg', githubText: 'github.com/alexmorgan', githubUrl: 'https://github.com/alexmorgan' },
+          stats: [
+            { value: '5+', label: 'Years experience' },
+            { value: '40+', label: 'Dashboards shipped' },
+            { value: '$2.4M', label: 'Revenue impact' }
+          ],
+          summary: { title: 'Professional Summary', text: '' },
+          skills: ['Python', 'SQL', 'Power BI', 'Tableau', 'A/B Testing', 'Forecasting'],
+          contact: { email: 'alex.morgan@email.com', location: 'New York, NY', linkedin: 'linkedin.com/in/alexmorgan', phone: '+1 (415) 224-9901' },
+          experience: [
+            { period: '2024 — Present', title: 'Lead Analytics Architect — FinTech Corp', text: 'Leading the design of cloud-based forecasting, self-serve dashboards, and executive insight systems across the organization.' }
+          ]
+        };
+
+        setValue('brand', fallback.site.brand);
+        setValue('github', fallback.site.github);
+        setValue('githubUrl', fallback.site.githubUrl);
+        setValue('heroEyebrow', fallback.hero.eyebrow);
+        setValue('heroTitle', fallback.hero.title);
+        setValue('heroDescription', fallback.hero.description);
+        setValue('profileName', fallback.profile.name);
+        setValue('profileImage', fallback.profile.image);
+        setValue('profileGithubText', fallback.profile.githubText);
+        setValue('profileGithubUrl', fallback.profile.githubUrl);
+        setValue('summaryTitle', fallback.summary.title);
+        setValue('summaryText', fallback.summary.text);
+        setValue('contactEmail', fallback.contact.email);
+        setValue('contactLocation', fallback.contact.location);
+        setValue('contactLinkedin', fallback.contact.linkedin);
+        setValue('contactPhone', fallback.contact.phone);
+        setValue('stat1Value', fallback.stats[0].value);
+        setValue('stat1Label', fallback.stats[0].label);
+        setValue('stat2Value', fallback.stats[1].value);
+        setValue('stat2Label', fallback.stats[1].label);
+        setValue('stat3Value', fallback.stats[2].value);
+        setValue('stat3Label', fallback.stats[2].label);
+        setValue('skills', fallback.skills.join(', '));
+        renderExperience(fallback.experience);
+      }
     }
 
     document.getElementById('addExperienceBtn').addEventListener('click', () => {
@@ -323,7 +346,7 @@
 
       const result = await response.json();
       const status = document.getElementById('status');
-      const publicPortfolioUrl = 'https://amans-2201.github.io/Static-Portfolio/';
+      const publicPortfolioUrl = `https://amans-2201.github.io/Static-Portfolio/?v=${Date.now()}`;
       if (response.ok) {
         status.textContent = 'Saved successfully.';
         setTimeout(() => window.location.href = publicPortfolioUrl, 700);
@@ -334,7 +357,7 @@
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
       sessionStorage.removeItem(authKey);
-      window.location.href = 'https://amans-2201.github.io/Static-Portfolio/';
+      window.location.href = `https://amans-2201.github.io/Static-Portfolio/?v=${Date.now()}`;
     });
 
     const shell = document.querySelector('.shell');
